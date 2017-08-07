@@ -1,0 +1,1 @@
+cmd_/home/cglee/study/wlogs/study/proc/proc.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/cglee/study/wlogs/study/proc/proc.ko /home/cglee/study/wlogs/study/proc/proc.o /home/cglee/study/wlogs/study/proc/proc.mod.o

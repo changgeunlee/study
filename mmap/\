@@ -1,0 +1,76 @@
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <time.h>
+
+#define BUF_SIZE 1024
+#define ADD_SIZE 512
+#define MMAP_PAGE 1024 
+
+#define INPUT_FILENAME "input_file"
+#define OUTPUT_FILENAME "output_file"
+
+typedef struct{
+	int num;
+	int name;
+	char msg;
+}__attribute__((packed)) LOG_CONFIG;
+
+
+void mmap_copy();
+
+int main(int argc, char **argv)
+{
+	pthread_t p_thread[2];
+	pthread_create(&p_thread[0],NULL,(void*)mmap_copy,NULL);
+
+	pthread_join(p_thread[0],NULL);
+
+}
+
+
+void mmap_copy(){
+	int fd=0;
+	char *mmap_data;
+	struct stat sb;
+	LOG_CONFIG log_config;
+	int flag= PROT_WRITE|PROT_READ;
+	int i =0;
+	int name,num;
+	char msg;
+
+	fd = open(INPUT_FILENAME,O_RDWR|O_CREAT,0664);
+	if (fd >= 0){
+		fstat(fd,&sb);
+		//printf("sb.st_size = %lu\n",sb.st_size);
+		if (( mmap_data = (char*)mmap(0,MMAP_PAGE,flag,MAP_SHARED,fd,0))== (char*)-1)
+		{
+			perror("mmap error");
+			exit(1);
+		}
+		while(1){
+			memset(&log_config,0x00,sizeof(LOG_CONFIG));
+			memcpy(&log_config,mmap_data,sizeof(LOG_CONFIG));
+			//get_log(log_config);
+			printf("%s\n",(LOG_CONFIG*)log_config);
+			//printf("%s\n",log_config);
+			usleep(1000000);
+		}
+		munmap(mmap_data,MMAP_PAGE);
+		close(fd);
+	}
+	else{
+		perror("mmap error");
+	} 
+	munmap(mmap_data,MMAP_PAGE);
+	close(fd);
+
+}
+
