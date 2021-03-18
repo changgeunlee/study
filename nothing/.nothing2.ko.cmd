@@ -1,0 +1,1 @@
+cmd_/home/cglee/study/wlogs/study/nothing/nothing2.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/cglee/study/wlogs/study/nothing/nothing2.ko /home/cglee/study/wlogs/study/nothing/nothing2.o /home/cglee/study/wlogs/study/nothing/nothing2.mod.o ;  true
